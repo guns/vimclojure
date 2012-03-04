@@ -306,7 +306,7 @@ function! vimclojure#Buffer.showText(text) dict
 		let text = a:text
 	endif
 	call append(line("$"), text)
-	normal ggdd
+	normal! gg"_dd
 endfunction
 
 function! vimclojure#Buffer.showOutput(output) dict
@@ -416,7 +416,6 @@ endfunction
 
 function! vimclojure#ClojureResultBuffer.showOutput(text) dict
 	call self.__superResultBufferShowOutput(a:text)
-	normal G
 endfunction
 
 " Nails

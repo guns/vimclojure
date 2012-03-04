@@ -532,7 +532,7 @@ if !exists("vimclojure#Browser")
 endif
 
 function! vimclojure#JavadocLookup(word)
-	let word = substitute(a:word, "\\.$", "", "")
+	let word = substitute(a:word, "\\v[./][^./]*", "", "")
 	let path = vimclojure#ExecuteNailWithInput("JavadocPath", word,
 				\ "-n", b:vimclojure_namespace)
 

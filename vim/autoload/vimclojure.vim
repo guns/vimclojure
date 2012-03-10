@@ -624,6 +624,7 @@ function! vimclojure#RequireFile(all)
 	let resultBuffer = g:vimclojure#ClojureResultBuffer.New(ns)
 	call resultBuffer.showOutput(result)
 	wincmd p
+	silent! edit
 endfunction
 
 function! vimclojure#RunTests(all)

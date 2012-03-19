@@ -847,8 +847,7 @@ endfunction
 
 function! vimclojure#Repl.showPrompt() dict
 	call self.showText(self._prompt . " ")
-	normal! G
-	startinsert!
+	normal! G$
 endfunction
 
 function! vimclojure#Repl.getCommand() dict

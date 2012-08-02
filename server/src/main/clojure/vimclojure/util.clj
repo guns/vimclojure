@@ -442,10 +442,10 @@
   (string/join
     "\n\n"
     (map (fn [n]
-           (let [mdata (mapv #((juxt :ns :name :arglists) (meta %))
-                             (vals (ns-publics n)))
+           (let [mdata (map #((juxt :ns :name (fn [m] (string/join \space (:arglists m)))) (meta %))
+                            (vals (ns-publics n)))
                  {defs  true
-                  funcs false} (group-by (comp nil? peek) mdata)
+                  funcs false} (group-by (comp empty? last) mdata)
                  len   (inc (apply max 0 (map (comp count str second) funcs)))
                  defs  (map #(apply format "%s/%s" %) defs)
                  funcs (map #(apply format (str "%s/%-" len "s%s") %) funcs)]

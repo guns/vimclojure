@@ -23,7 +23,8 @@
 (ns vimclojure.util
   (:require
     [clojure.pprint :as pprint]
-    [clojure.stacktrace :as stacktrace]))
+    [clojure.stacktrace :as stacktrace]
+    [clojure.string :as string]))
 
 ; Common helpers
 (defn str-cut
@@ -430,3 +431,33 @@
   (catch Exception exc
     (when-not (re-find #"Could not locate clj_stacktrace/repl__init.class or clj_stacktrace/repl.clj on classpath" (str exc))
       (throw exc))))
+
+;;;
+;;; Clojure cheat-sheet
+;;;
+
+(defn cheat-sheet
+  "Return a formatted summary of public vars in given namespaces."
+  [& namespaces]
+  (string/join
+    "\n\n"
+    (map (fn [n]
+           (let [mdata (mapv #((juxt :ns :name :arglists) (meta %))
+                             (vals (ns-publics n)))
+                 {defs  true
+                  funcs false} (group-by (comp nil? peek) mdata)
+                 len   (inc (apply max 0 (map (comp count str second) funcs)))
+                 defs  (map #(apply format "%s/%s" %) defs)
+                 funcs (map #(apply format (str "%s/%-" len "s%s") %) funcs)]
+             (str ";;; " n " {{{1\n\n"
+                  (string/join "\n" (sort defs))
+                  (when (seq defs) "\n")
+                  (string/join "\n" (sort funcs)))))
+         (sort-by ns-name namespaces))))
+
+(defn print-cheat-sheet!
+  "Print cheat sheets for extant namespaces filtered by optional regex."
+  ([] (print-cheat-sheet! #"."))
+  ([re] (let [xs (filter #(re-seq re (str %)) (all-ns))]
+          (when (seq xs)
+            (println (apply cheat-sheet xs))))))

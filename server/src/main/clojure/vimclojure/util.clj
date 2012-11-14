@@ -441,19 +441,18 @@
   [& namespaces]
   (string/join
     "\n\n"
-    (map (fn [n]
-           (let [mdata (map #((juxt :ns :name (fn [m] (string/join \space (:arglists m)))) (meta %))
-                            (vals (ns-publics n)))
-                 {defs  true
-                  funcs false} (group-by (comp empty? last) mdata)
-                 len   (inc (apply max 0 (map (comp count str second) funcs)))
-                 defs  (map #(apply format "%s/%s" %) defs)
-                 funcs (map #(apply format (str "%s/%-" len "s%s") %) funcs)]
-             (str ";;; " n " {{{1\n\n"
-                  (string/join "\n" (sort defs))
-                  (when (seq defs) "\n")
-                  (string/join "\n" (sort funcs)))))
-         (sort-by ns-name namespaces))))
+    (map (fn [nspace]
+           (let [nsname (str nspace)
+                 mdata (map meta (vals (ns-publics nspace)))
+                 {funcs true defs false} (group-by #(contains? % :arglists) mdata)
+                 funclen (apply max 0 (map (comp count str :name) funcs))
+                 defnames (map #(str nsname "/" (:name %)) defs)
+                 funcnames (map #(format (str "%s/%-" funclen "s %s")
+                                         nsname (:name %)
+                                         (string/join \space (:arglists %))) funcs)]
+             (str ";;; " nsname " {{{1\n\n"
+                  (string/join "\n" (concat (sort defnames) (sort funcnames))))))
+         (sort-by str namespaces))))
 
 (defn print-cheat-sheet!
   "Print cheat sheets for extant namespaces filtered by optional regex."

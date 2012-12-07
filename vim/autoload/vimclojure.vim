@@ -675,6 +675,7 @@ function! vimclojure#EvalBlock()
 endfunction
 
 function! vimclojure#EvalToplevel()
+	normal! mp
 	let file = vimclojure#BufferName()
 	let ns = b:vimclojure_namespace
 	let [pos, expr] = vimclojure#ExtractSexpr(1)
@@ -685,6 +686,7 @@ function! vimclojure#EvalToplevel()
 	let resultBuffer = g:vimclojure#ClojureResultBuffer.New(ns)
 	call resultBuffer.showOutput(result)
 	wincmd p
+	normal! `p
 endfunction
 
 function! ClojureEvalParagraphWorker() dict

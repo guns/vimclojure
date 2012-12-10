@@ -661,13 +661,13 @@ function! vimclojure#EvalLine()
 	wincmd p
 endfunction
 
-function! vimclojure#EvalBlock()
+function! vimclojure#EvalBlock(async)
 	let file = vimclojure#BufferName()
 	let ns = b:vimclojure_namespace
 
 	let content = vimclojure#util#Yank("l", 'normal! gv"ly')
 	let result = vimclojure#ExecuteNailWithInput("Repl", content,
-				\ "-r", "-n", ns, "-f", file, "-l", line("'<") - 1)
+				\ "-r", "-n", ns, "-f", file, "-l", line("'<") - 1, a:async ? "-a" : "-r")
 
 	let resultBuffer = g:vimclojure#ClojureResultBuffer.New(ns)
 	call resultBuffer.showOutput(result)

@@ -63,6 +63,34 @@
     ; VimClojure specific.
     *print-pretty*])
 
+(def *futures*
+  "A vector of futures run by the user."
+  (atom []))
+
+(defn flush-futures []
+  (swap! *futures* #(filterv (complement realized?) %)))
+
+(defn push-future [form-seq]
+  (swap! *futures* conj (with-meta (eval `(future ~@form-seq))
+                                   {:source (clojure.string/join "\n" form-seq)})))
+
+(defn print-futures []
+  (println "(vimclojure.repl/cancel-futures) ; Cancel all\n")
+  (doseq [f (reverse @*futures*)
+          :let [source (:source (meta f))]]
+    (println (cond (future-cancelled? f) (format "Cancelled:\n%s\n" source)
+                   (realized? f) (format "%s\nRealized: %s\n" source @f)
+                   :else (format "(vimclojure.repl/cancel-futures %s)\n%s\n"
+                                 (hash f) source)))))
+
+(defn cancel-futures [& codes]
+  (doseq [f (if (seq codes)
+              (let [s (set codes)]
+                (filter #(contains? s (hash %)) @*futures*))
+              @*futures*)]
+    (future-cancel f)
+    (swap! *futures* (fn [fs] (filterv #(= f %) fs)))))
+
 (defn make-repl
   "Create a new Repl."
   ([id] (make-repl id nil))
@@ -156,16 +184,20 @@
   Repl is retrieved using the given id. Output goes to *out* and *err*.
   The initial input line and the file are set to the supplied values.
   Ignore flags whether the evaluation result is saved in the star Vars."
-  [id nspace file line ignore]
+  [id nspace file line ignore & {:keys [async?]}]
   (with-repl id nspace file line
     (try
-      (doseq [form (stream->seq *in*)]
-        (let [result (eval form)]
-          ((if vimclojure.repl/*print-pretty* pretty-print prn) result)
-          (when-not ignore
-            (set! *3 *2)
-            (set! *2 *1)
-            (set! *1 result))))
+      (let [form-seq (stream->seq *in*)]
+        (if async?
+          (do (push-future form-seq)
+              (print-futures))
+          (doseq [form form-seq]
+            (let [result (eval form)]
+              ((if vimclojure.repl/*print-pretty* pretty-print prn) result)
+              (when-not ignore
+                (set! *3 *2)
+                (set! *2 *1)
+                (set! *1 result))))))
       (catch Throwable e
         (binding [*out* *err*]
           (if (= id -1)

@@ -237,6 +237,7 @@
   [[start?  s "Start a new Repl."]
    [stop?   S "Stop the Repl of the given id."]
    [run?    r "Run the input in the Repl context of the given id."]
+   [async?  a "Run the input asynchronously."]
    [id      i "The id of the repl to act on." "-1"]
    [nspace  n "Change to namespace before executing the input." ""]
    [file    f "The filename to be set." "REPL"]
@@ -249,7 +250,7 @@
     (cond
       start {:id (repl/start nspace)}
       stop  (repl/stop id)
-      run   (repl/run id nspace file line ignore))))
+      run   (repl/run id nspace file line ignore :async? async))))
 
 (defnail ReplNamespace
   "Usage: ng vimclojure.nails.Repl [options]"

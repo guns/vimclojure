@@ -135,6 +135,9 @@ call vimclojure#MapPlug("n", "fl", "FutureList")
 call vimclojure#MapPlug("n", "ff", "FutureFlush")
 call vimclojure#MapPlug("n", "fc", "FutureCancel")
 
+call vimclojure#MapPlug("n", "cs", "CheatSheetAll")
+call vimclojure#MapPlug("n", "ci", "CheatSheetInteractive")
+
 call vimclojure#MapPlug("n", "sr", "StartLocalRepl")
 call vimclojure#MapPlug("n", "sR", "StartRepl")
 

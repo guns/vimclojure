@@ -51,6 +51,9 @@ call vimclojure#MakeCommandPlug("n", "FutureList", "vimclojure#Eval", "\"(vimclo
 call vimclojure#MakeCommandPlug("n", "FutureFlush", "vimclojure#Eval", "\"(do (vimclojure.repl/flush-futures) (vimclojure.repl/print-futures))\"")
 call vimclojure#MakeCommandPlug("n", "FutureCancel", "vimclojure#Eval", "\"(do (vimclojure.repl/cancel-futures) (vimclojure.repl/print-futures))\"")
 
+call vimclojure#MakeCommandPlug("n", "CheatSheetAll", "vimclojure#CheatSheet", "0")
+call vimclojure#MakeCommandPlug("n", "CheatSheetInteractive", "vimclojure#CheatSheet", "1")
+
 call vimclojure#MakeCommandPlug("n", "StartRepl", "vimclojure#StartRepl", "")
 call vimclojure#MakeCommandPlug("n", "StartLocalRepl", "vimclojure#StartRepl", "b:vimclojure_namespace")
 

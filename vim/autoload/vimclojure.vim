@@ -718,6 +718,18 @@ function! vimclojure#Eval(content)
 	call resultBuffer.showOutput(result)
 endfunction
 
+function! vimclojure#CheatSheet(input)
+	if a:input
+		let clj = "(vimclojure.util/print-cheat-sheet! #\"" . input('Namespace filter regex: ') . "\")"
+	else
+		let clj = "(vimclojure.util/print-cheat-sheet!)"
+	endif
+	call vimclojure#Eval(clj)
+	normal! "cd/\v^nil
+	wincmd q | vsplit | wincmd L | execute 'Scratch' | setlocal filetype=clojure foldmethod=marker
+	normal! gg"_dG"cP
+endfunction
+
 " The Repl
 let vimclojure#Repl = copy(vimclojure#Buffer)
 let vimclojure#Repl.__superBufferNew = vimclojure#Repl.New
